@@ -6,15 +6,14 @@ import DashboardPage from "../pages/private/dashboard/DashboardPage";
 import StudentsListingPage from "../pages/private/students/StudentsListingPage";
 const PrivateRoutes = [
   {
-    path: "/api/",
     element: (
       <ProtectedRoutes>
         <PrivateLayout />
       </ProtectedRoutes>
     ),
     children: [
-      { path: "dashboard", element: <DashboardPage /> },
-      { path: "students", element: <StudentsListingPage /> },
+      { path: "/dashboard", element: <DashboardPage /> },
+      { path: "/students", element: <StudentsListingPage /> },
     ],
   },
 ];

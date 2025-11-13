@@ -1,7 +1,7 @@
 import React from "react";
 
 const ProtectedRoutes = ({ children }) => {
-  return { children };
+  return children;
 };
 
 export default ProtectedRoutes;

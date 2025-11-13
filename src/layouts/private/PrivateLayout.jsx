@@ -1,7 +1,7 @@
 import React from "react";
-
+import { Outlet } from "react-router";
 const PrivateLayout = () => {
-  return <div>PrivateLayout</div>;
+  return <Outlet />;
 };
 
 export default PrivateLayout;

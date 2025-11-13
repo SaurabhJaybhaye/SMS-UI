@@ -6,7 +6,6 @@ import PublicRoutes from "./PublicRoutes";
 import PrivateRoutes from "./PrivateRoutes";
 
 const Router = () => {
-  console.log("PrivateRoutes", PrivateRoutes);
   const routes = createBrowserRouter([...PublicRoutes, ...PrivateRoutes]);
   return <RouterProvider router={routes} />;
 };
