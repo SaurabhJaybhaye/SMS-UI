@@ -32,13 +32,13 @@ function PublicNavbar() {
       <List>
         {navItems.map((item) => (
           <ListItem key={item} disablePadding>
-            <ListItemButton
-              sx={{ textAlign: "center" }}
-              onClick={() => {
-                console.log("wotking");
-              }}
-            >
-              {item}
+            <ListItemButton sx={{ textAlign: "center" }}>
+              <ListItemText
+                primary={item}
+                onClick={() => {
+                  console.log("working test");
+                }}
+              />
             </ListItemButton>
           </ListItem>
         ))}
@@ -69,7 +69,13 @@ function PublicNavbar() {
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
             {navItems.map((item) => (
-              <Button key={item} sx={{ color: "#fff" }}>
+              <Button
+                key={item}
+                sx={{ color: "#fff" }}
+                onClick={() => {
+                  console.log("working");
+                }}
+              >
                 {item}
               </Button>
             ))}
