@@ -1,6 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import "./LoginPage.css";
-const LoginPage = ({ formik }) => {
+import { useNavigate } from "react-router";
+
+const LoginPage = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: "admin@gmail.com",
+    password: "admin@123",
+    showPassword: false,
+  });
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prevData) => {
+      return {
+        ...prevData,
+        [name]: type === "checkbox" ? checked : value,
+      };
+    });
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Login attempted with", formData);
+    if (!formData.email || !formData.password) {
+      alert("Please fill in all fields");
+      return;
+    }
+    if (
+      formData.email === "admin@gmail.com" ||
+      formData.password === "admin@123"
+    ) {
+      alert("Login successful");
+      navigate("/dashboard");
+    } else {
+      alert("Invalid credentials");
+    }
+  };
+
   return (
     <div id="login">
       <div className="container-fluid ps-md-0">
@@ -13,7 +48,7 @@ const LoginPage = ({ formik }) => {
                   <div className="col-md-9 col-lg-8 mx-auto">
                     <h3 className="login-heading mb-4">Welcome back!</h3>
 
-                    <form onSubmit={formik?.handleSubmit}>
+                    <form>
                       <div className="form-floating mb-3">
                         <input
                           type="text"
@@ -21,36 +56,22 @@ const LoginPage = ({ formik }) => {
                           id="floatingInput"
                           placeholder="name@example.com"
                           name="email"
-                          onChange={formik?.handleChange}
-                          value={formik?.values.email}
-                          onBlur={formik?.handleBlur}
+                          onChange={handleChange}
+                          value={formData.email}
                         />
                         <label htmlFor="floatingInput">Email address</label>
-                        {formik?.errors.email && formik?.touched.email ? (
-                          <p className="text-danger ms-1 error-text pb-0 mb-0">
-                            {formik?.errors.email}
-                          </p>
-                        ) : null}
                       </div>
                       <div className="form-floating mb-3">
                         <input
-                          type={
-                            formik?.values.showPassword ? "text" : "password"
-                          }
+                          type={formData.showPassword ? "text" : "password"}
                           className="form-control"
                           id="floatingPassword"
                           placeholder="Password"
                           name="password"
-                          onChange={formik?.handleChange}
-                          value={formik?.values.password}
-                          onBlur={formik?.handleBlur}
+                          onChange={handleChange}
+                          value={formData.password}
                         />
                         <label htmlFor="floatingPassword">Password</label>
-                        {formik?.errors.password && formik?.touched.password ? (
-                          <p className="text-danger ms-1 mb-0 pb-0 error-text">
-                            {formik?.errors.password}
-                          </p>
-                        ) : null}
                       </div>
 
                       <div className="form-check mb-3">
@@ -59,8 +80,8 @@ const LoginPage = ({ formik }) => {
                           type="checkbox"
                           id="rememberPasswordCheck"
                           name="showPassword"
-                          onChange={formik?.handleChange}
-                          value={formik?.values.showPassword}
+                          onChange={handleChange}
+                          checked={formData.showPassword}
                         />
                         <label
                           className="form-check-label"
@@ -73,8 +94,8 @@ const LoginPage = ({ formik }) => {
                       <div className="d-grid">
                         <button
                           className="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2"
-                          type="submit"
-                          disabled={!formik?.dirty || !formik?.isValid}
+                          type="button"
+                          onClick={handleSubmit}
                         >
                           Sign in
                         </button>

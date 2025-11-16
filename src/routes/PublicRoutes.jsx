@@ -6,6 +6,7 @@ import SignupPage from "../pages/public/signup/SignupPage";
 import ForgotPasswordPage from "../pages/public/forgot-password/ForgotPasswordPage";
 import HomePage from "../pages/public/home/HomePage";
 import PageNotFound from "../pages/public/page-not-found/PageNotFound";
+import RegisterPage from "../pages/public/register/RegisterPage";
 
 const PublicRoutes = [
   {
@@ -17,7 +18,7 @@ const PublicRoutes = [
     children: [
       { index: true, element: <HomePage /> },
       { path: "login", element: <LoginPage /> },
-      { path: "register", element: <SignupPage /> },
+      { path: "signup", element: <RegisterPage /> },
       { path: "forgot-password", element: <ForgotPasswordPage /> },
     ],
   },
