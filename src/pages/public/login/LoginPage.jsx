@@ -1,14 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./LoginPage.css";
 import { useNavigate } from "react-router";
+import leftArrow from "../../../assets/icons/leftArrow.svg";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: "admin@gmail.com",
-    password: "admin@123",
+    email: "saurabh",
+    password: "Saurabh@123",
     showPassword: false,
   });
+
+  useEffect(() => {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    if (currentUser && currentUser.isLoggedIn) {
+      navigate("/dashboard");
+      return;
+    }
+  }, [navigate]);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prevData) => {
@@ -25,10 +35,30 @@ const LoginPage = () => {
       alert("Please fill in all fields");
       return;
     }
+    const registerUser = JSON.parse(localStorage.getItem("registeredUser"));
+    if (!registerUser || registerUser.length === 0) {
+      alert("No registered users found. Please register first.");
+      return;
+    }
+    const registerUserDetails = registerUser?.find(
+      (user) => user.email === formData.email
+    );
+    console.log(
+      "🚀 ~ handleSubmit ~ registerUserDetails:",
+      registerUserDetails
+    );
     if (
-      formData.email === "admin@gmail.com" ||
-      formData.password === "admin@123"
+      formData.email === registerUserDetails?.email ||
+      formData.password === registerUserDetails?.password
     ) {
+      localStorage.setItem(
+        "currentUser",
+        JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          isLoggedIn: true,
+        })
+      );
       alert("Login successful");
       navigate("/dashboard");
     } else {
@@ -40,7 +70,10 @@ const LoginPage = () => {
     <div id="login">
       <div className="container-fluid ps-md-0">
         <div className="row g-0">
-          <div className="d-none d-md-flex col-md-4 col-lg-6 bg-image"></div>
+          <div className="d-none d-md-flex col-md-4 col-lg-6 bg-image">
+            <img src={leftArrow} alt="left Arrow icon" className="icon" /> Go
+            Home
+          </div>
           <div className="col-md-8 col-lg-6">
             <div className="login d-flex align-items-center py-5">
               <div className="container">
@@ -97,7 +130,7 @@ const LoginPage = () => {
                           type="button"
                           onClick={handleSubmit}
                         >
-                          Sign in
+                          Login
                         </button>
                       </div>
                     </form>
