@@ -1,25 +1,35 @@
 import React, { useState } from "react";
 import "./LoginPage.css";
 import { useNavigate } from "react-router";
+import { PRIVATE_ROUTES } from "../../../utils/constants";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    showPassword: false,
+  });
+
+  const handleChange = (e) => {
+    const { name, type, checked, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Login attempted with", {
-      email,
-      password,
-    });
-    if (!email || !password) {
-      alert("Please fill in all fields");
-      return;
-    }
-    if (email === "admin@gmail.com" || password === "admin@123") {
+    console.log("Login attempted with", formData);
+
+    if (
+      formData.email === "admin@gmail.com" ||
+      formData.password === "admin@123"
+    ) {
       alert("Login successful");
-      navigate("/dashboard");
+      navigate(`/${PRIVATE_ROUTES.DASHBOARD}`);
     } else {
       alert("Invalid credentials");
     }
@@ -37,30 +47,30 @@ const LoginPage = () => {
                   <div className="col-md-9 col-lg-8 mx-auto">
                     <h3 className="login-heading mb-4">Welcome back!</h3>
 
-                    <form>
+                    <form onSubmit={handleSubmit}>
                       <div className="form-floating mb-3">
                         <input
-                          type="text"
+                          type="email"
                           className="form-control"
                           id="floatingInput"
                           placeholder="name@example.com"
                           name="email"
-                          onChange={(e) => {
-                            setEmail(e.target.value);
-                          }}
+                          value={formData.email}
+                          onChange={handleChange}
+                          required={true}
                         />
                         <label htmlFor="floatingInput">Email address</label>
                       </div>
                       <div className="form-floating mb-3">
                         <input
-                          type={showPassword ? "text" : "password"}
+                          type={formData.showPassword ? "text" : "password"}
                           className="form-control"
                           id="floatingPassword"
                           placeholder="Password"
                           name="password"
-                          onChange={(e) => {
-                            setPassword(e.target.value);
-                          }}
+                          value={formData.password}
+                          onChange={handleChange}
+                          required
                         />
                         <label htmlFor="floatingPassword">Password</label>
                       </div>
@@ -71,9 +81,8 @@ const LoginPage = () => {
                           type="checkbox"
                           id="rememberPasswordCheck"
                           name="showPassword"
-                          onChange={(e) => {
-                            setShowPassword(e.target.checked);
-                          }}
+                          onChange={handleChange}
+                          checked={formData.showPassword}
                         />
                         <label
                           className="form-check-label"
@@ -86,8 +95,7 @@ const LoginPage = () => {
                       <div className="d-grid">
                         <button
                           className="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2"
-                          type="button"
-                          onClick={handleSubmit}
+                          type="submit"
                         >
                           Sign in
                         </button>

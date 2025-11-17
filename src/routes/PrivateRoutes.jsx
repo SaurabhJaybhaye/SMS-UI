@@ -1,16 +1,17 @@
 import PrivateLayout from "../layout/private/PrivateLayout";
 import DashboardPage from "../pages/private/dashboard/DashboardPage";
 import StudentsPage from "../pages/private/students/StudentsPage";
+import { PRIVATE_ROUTES } from "../utils/constants";
 const PrivateRoutes = [
   {
     element: <PrivateLayout />,
     children: [
       {
-        path: "dashboard",
+        path: PRIVATE_ROUTES.DASHBOARD,
         element: <DashboardPage />,
       },
       {
-        path: "students-list",
+        path: PRIVATE_ROUTES.STUDENT_LIST,
         element: <StudentsPage />,
       },
     ],

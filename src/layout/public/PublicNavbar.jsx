@@ -3,13 +3,14 @@ import { useNavigate } from "react-router";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
+import { PUBLIC_ROUTES, SCHOOL_NAME } from "../../utils/constants";
 
 const PublicNavbar = () => {
   const navigate = useNavigate();
   const navItems = [
-    { title: "Home", path: "/" },
-    { title: "About Us", path: "/about-us" },
-    { title: "Register", path: "/signup" },
+    { title: "Home", path: PUBLIC_ROUTES.HOME },
+    { title: "About Us", path: PUBLIC_ROUTES.ABOUT_US },
+    { title: "Register", path: PUBLIC_ROUTES.SIGNUP },
   ];
   return (
     <div id="PublicNavbar">
@@ -17,7 +18,7 @@ const PublicNavbar = () => {
         <Container>
           <Navbar.Brand>
             {/* <img src={logo} alt="logo" className="logo" /> {COLLEGE_NAME} */}
-            SMS
+            {SCHOOL_NAME}
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
