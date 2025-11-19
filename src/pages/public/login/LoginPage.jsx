@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./LoginPage.css";
 import { useNavigate } from "react-router";
-import { PRIVATE_ROUTES } from "../../../utils/constants";
+import { PRIVATE_ROUTES, PUBLIC_ROUTES } from "../../../utils/constants";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -23,17 +23,35 @@ const LoginPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Login attempted with", formData);
-
-    if (
-      formData.email === "admin@gmail.com" ||
-      formData.password === "admin@123"
-    ) {
+    const users = JSON.parse(localStorage.getItem("registeredUser")) || [];
+    if (users.length <= 0) {
+      alert("No registered users found. Please register first.");
+      navigate(`/${PUBLIC_ROUTES.SIGNUP}`);
+      return;
+    }
+    const userData = users.find(
+      (user) =>
+        user.email === formData.email && user.password === formData.password
+    );
+    if (userData) {
+      localStorage.setItem(
+        "loggedInUser",
+        JSON.stringify({ ...userData, isLoggedIn: true })
+      );
       alert("Login successful");
       navigate(`/${PRIVATE_ROUTES.DASHBOARD}`);
     } else {
       alert("Invalid credentials");
     }
   };
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (user && user.isLoggedIn) {
+      navigate(`/${PRIVATE_ROUTES.DASHBOARD}`);
+      return;
+    }
+  }, [navigate]);
 
   return (
     <div id="login">
