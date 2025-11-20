@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { PUBLIC_ROUTES } from "../../utils/constants";
+import HeaderComponent from "./header/HeaderComponent";
 
 const PrivateLayout = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const PrivateLayout = () => {
 
   return (
     <>
-      <h1>Private Layout Header</h1>
+      <HeaderComponent />
       <Outlet />
     </>
   );

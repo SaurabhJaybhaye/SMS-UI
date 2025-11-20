@@ -3,17 +3,27 @@ import { useNavigate } from "react-router";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
-import { PUBLIC_ROUTES, SCHOOL_NAME } from "../../utils/constants";
+import {
+  PRIVATE_ROUTES,
+  PUBLIC_ROUTES,
+  SCHOOL_NAME,
+} from "../../../utils/constants";
 
-const PublicNavbar = () => {
+const HeaderComponent = () => {
   const navigate = useNavigate();
   const navItems = [
-    { title: "Home", path: PUBLIC_ROUTES.HOME },
-    { title: "About Us", path: PUBLIC_ROUTES.ABOUT_US },
-    { title: "Register", path: PUBLIC_ROUTES.SIGNUP },
+    { title: "Dashboard", path: PRIVATE_ROUTES.DASHBOARD },
+    { title: "Students", path: PRIVATE_ROUTES.STUDENT_LIST },
+    { title: "Settings", path: PRIVATE_ROUTES.SETTINGS },
   ];
+
+  const handleLogout = () => {
+    localStorage.removeItem("loggedInUser");
+    navigate(PUBLIC_ROUTES.LOGIN);
+  };
+
   return (
-    <div id="PublicNavbar">
+    <div id="HeaderComponent">
       <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
         <Container>
           <Navbar.Brand>
@@ -38,13 +48,8 @@ const PublicNavbar = () => {
               })}
             </Nav>
             <Nav>
-              <Nav.Link
-                className="link"
-                onClick={() => {
-                  navigate(PUBLIC_ROUTES.LOGIN);
-                }}
-              >
-                Login
+              <Nav.Link className="link" onClick={handleLogout}>
+                Logout
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>
@@ -54,4 +59,4 @@ const PublicNavbar = () => {
   );
 };
 
-export default PublicNavbar;
+export default HeaderComponent;

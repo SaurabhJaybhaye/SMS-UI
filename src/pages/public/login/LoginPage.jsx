@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./LoginPage.css";
 import { useNavigate } from "react-router";
 import { PRIVATE_ROUTES, PUBLIC_ROUTES } from "../../../utils/constants";
+import InputComponent from "../../../components/input/InputComponent";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -11,6 +12,10 @@ const LoginPage = () => {
     password: "",
     showPassword: false,
   });
+  const [errorMessage, setErrorMessage] = useState({
+    email: null,
+    password: null,
+  });
 
   const handleChange = (e) => {
     const { name, type, checked, value } = e.target;
@@ -18,14 +23,31 @@ const LoginPage = () => {
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
+    setErrorMessage(null);
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    if (value.trim() === "") {
+      setErrorMessage((prev) => {
+        return { ...prev, [name]: `${name} is required` };
+      });
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Login attempted with", formData);
+    if (formData.email.trim() === "" || formData.password.trim() === "") {
+      setErrorMessage({
+        email: formData.email.trim() === "" ? "Email is required" : null,
+        password:
+          formData.password.trim() === "" ? "Password is required" : null,
+      });
+      return;
+    }
     const users = JSON.parse(localStorage.getItem("registeredUser")) || [];
     if (users.length <= 0) {
-      alert("No registered users found. Please register first.");
+      alert("No users found. Please sign up first.");
       navigate(`/${PUBLIC_ROUTES.SIGNUP}`);
       return;
     }
@@ -66,34 +88,28 @@ const LoginPage = () => {
                     <h3 className="login-heading mb-4">Welcome back!</h3>
 
                     <form onSubmit={handleSubmit}>
-                      <div className="form-floating mb-3">
-                        <input
-                          type="email"
-                          className="form-control"
-                          id="floatingInput"
-                          placeholder="name@example.com"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          required={true}
-                        />
-                        <label htmlFor="floatingInput">Email address</label>
-                      </div>
-                      <div className="form-floating mb-3">
-                        <input
-                          type={formData.showPassword ? "text" : "password"}
-                          className="form-control"
-                          id="floatingPassword"
-                          placeholder="Password"
-                          name="password"
-                          value={formData.password}
-                          onChange={handleChange}
-                          required
-                        />
-                        <label htmlFor="floatingPassword">Password</label>
-                      </div>
+                      <InputComponent
+                        type="email"
+                        placeholder="Email"
+                        handleChange={handleChange}
+                        onBlur={handleBlur}
+                        name="email"
+                        value={formData?.email}
+                        errorMessage={errorMessage?.email}
+                        label="Email address"
+                      />
+                      <InputComponent
+                        type={formData?.showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        handleChange={handleChange}
+                        onBlur={handleBlur}
+                        name="password"
+                        value={formData?.password}
+                        errorMessage={errorMessage?.password}
+                        label="Password"
+                      />
 
-                      <div className="form-check mb-3">
+                      <div className="form-check mt-3">
                         <input
                           className="form-check-input"
                           type="checkbox"
