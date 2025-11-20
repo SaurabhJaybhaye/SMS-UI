@@ -1,47 +1,55 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import "../login/LoginPage.css";
 import { PUBLIC_ROUTES } from "../../../utils/constants";
+import InputComponent from "../../../components/input/InputComponent";
+
+// Validation schema using Yup
+const validationSchema = Yup.object({
+  name: Yup.string().required("Name is required"),
+  email: Yup.string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Passwords must match")
+    .required("Confirm Password is required"),
+});
 
 const RegisterPage = () => {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      const oldUsers = JSON.parse(localStorage.getItem("registeredUser")) || [];
+
+      const updatedUsers = [
+        ...oldUsers,
+        {
+          name: values.name,
+          email: values.email,
+          password: values.password,
+          role: "user",
+        },
+      ];
+
+      localStorage.setItem("registeredUser", JSON.stringify(updatedUsers));
+
+      alert("Registration successful");
+      navigate(`/${PUBLIC_ROUTES.LOGIN}`);
+    },
   });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Registration attempted with", formData);
-    if (formData.password !== formData.confirmPassword) {
-      alert("password and confirm password do not match");
-      return;
-    }
-    const oldUsers = JSON.parse(localStorage.getItem("registeredUser")) || [];
-    const updatedUsers = [
-      ...oldUsers,
-      {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        role: "user",
-      },
-    ];
-    localStorage.setItem("registeredUser", JSON.stringify(updatedUsers));
-    alert("Registration successful");
-    navigate(`/${PUBLIC_ROUTES.LOGIN}`);
-  };
 
   return (
     <div id="login">
@@ -55,68 +63,68 @@ const RegisterPage = () => {
                   <div className="col-md-9 col-lg-8 mx-auto">
                     <h3 className="login-heading mb-4">Signup</h3>
 
-                    <form onSubmit={handleSubmit}>
-                      <div className="form-floating mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="floatingInput"
-                          placeholder="Name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          required
-                        />
-                        <label htmlFor="floatingInput">name</label>
-                      </div>
-                      <div className="form-floating mb-3">
-                        <input
-                          type="email"
-                          className="form-control"
-                          id="floatingInput"
-                          placeholder="name@example.com"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          required={true}
-                        />
-                        <label htmlFor="floatingInput">Email address</label>
-                      </div>
-                      <div className="form-floating mb-3">
-                        <input
-                          type="password"
-                          className="form-control"
-                          id="floatingPassword"
-                          placeholder="Password"
-                          name="password"
-                          value={formData.password}
-                          onChange={handleChange}
-                          required
-                        />
-                        <label htmlFor="floatingPassword">Password</label>
-                      </div>
-                      <div className="form-floating mb-3">
-                        <input
-                          type="password"
-                          className="form-control"
-                          id="floatingPassword"
-                          placeholder="Confirm Password"
-                          name="confirmPassword"
-                          value={formData.confirmPassword}
-                          onChange={handleChange}
-                          required
-                        />
-                        <label htmlFor="floatingPassword">
-                          Confirm Password
-                        </label>
-                      </div>
+                    <form onSubmit={formik.handleSubmit}>
+                      {/* Name */}
+                      <InputComponent
+                        type="text"
+                        placeholder="Name"
+                        handleChange={formik.handleChange}
+                        name="name"
+                        value={formik.values.name}
+                        label="Name"
+                      />
+                      {formik.touched.name && formik.errors.name && (
+                        <p className="text-danger">{formik.errors.name}</p>
+                      )}
 
-                      <div className="d-grid">
+                      {/* Email */}
+                      <InputComponent
+                        type="email"
+                        placeholder="Email"
+                        handleChange={formik.handleChange}
+                        name="email"
+                        value={formik.values.email}
+                        label="Email address"
+                      />
+                      {formik.touched.email && formik.errors.email && (
+                        <p className="text-danger">{formik.errors.email}</p>
+                      )}
+
+                      {/* Password */}
+                      <InputComponent
+                        type="password"
+                        placeholder="Password"
+                        handleChange={formik.handleChange}
+                        name="password"
+                        value={formik.values.password}
+                        label="Password"
+                      />
+                      {formik.touched.password && formik.errors.password && (
+                        <p className="text-danger">{formik.errors.password}</p>
+                      )}
+
+                      {/* Confirm Password */}
+                      <InputComponent
+                        type="password"
+                        placeholder="Confirm Password"
+                        handleChange={formik.handleChange}
+                        name="confirmPassword"
+                        value={formik.values.confirmPassword}
+                        label="Confirm Password"
+                      />
+                      {formik.touched.confirmPassword &&
+                        formik.errors.confirmPassword && (
+                          <p className="text-danger">
+                            {formik.errors.confirmPassword}
+                          </p>
+                        )}
+
+                      <div className="mt-3 d-grid">
                         <button
                           className="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2"
                           type="submit"
                         >
-                          Sign in
+                          Sign Up
                         </button>
                       </div>
                     </form>
