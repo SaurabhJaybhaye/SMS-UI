@@ -1,52 +1,46 @@
 import React, { useState } from "react";
-import "../login/LoginPage.css";
 import { useNavigate } from "react-router";
-import DropDown from "../../../components/select/DropDown";
+import "../login/LoginPage.css";
+import { PUBLIC_ROUTES } from "../../../utils/constants";
+
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const roleOptions = [
-    {
-      value: "user",
-      label: "User",
-    },
-    {
-      value: "admin",
-      label: "Admin",
-    },
-    {
-      value: "teacher",
-      label: "Teacher",
-    },
-    {
-      value: "student",
-      label: "Student",
-    },
-  ];
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [name, setName] = useState("");
-  const [role, setRole] = useState("user");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      alert("Password and confirm password do not match");
+    console.log("Registration attempted with", formData);
+    if (formData.password !== formData.confirmPassword) {
+      alert("password and confirm password do not match");
       return;
     }
-    console.log("Login attempted with", {
-      email,
-      password,
-      name,
-      role,
-    });
-    const prevUsers = JSON.parse(localStorage.getItem("registeredUser")) || [];
-    console.log("Previous Users:", prevUsers);
-    prevUsers.push({ email, password, name, role });
-    localStorage.setItem("registeredUser", JSON.stringify(prevUsers));
-    alert("Register successful");
-    navigate("/login");
+    const oldUsers = JSON.parse(localStorage.getItem("registeredUser")) || [];
+    const updatedUsers = [
+      ...oldUsers,
+      {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: "user",
+      },
+    ];
+    localStorage.setItem("registeredUser", JSON.stringify(updatedUsers));
+    alert("Registration successful");
+    navigate(`/${PUBLIC_ROUTES.LOGIN}`);
   };
 
   return (
@@ -59,33 +53,32 @@ const RegisterPage = () => {
               <div className="container">
                 <div className="row">
                   <div className="col-md-9 col-lg-8 mx-auto">
-                    <h3 className="login-heading mb-4">Welcome back!</h3>
+                    <h3 className="login-heading mb-4">Signup</h3>
 
-                    <form>
+                    <form onSubmit={handleSubmit}>
                       <div className="form-floating mb-3">
                         <input
                           type="text"
                           className="form-control"
                           id="floatingInput"
                           placeholder="Name"
-                          name="text"
-                          onChange={(e) => {
-                            setName(e.target.value);
-                          }}
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          required
                         />
-                        <label htmlFor="floatingInput">Name</label>
+                        <label htmlFor="floatingInput">name</label>
                       </div>
-
                       <div className="form-floating mb-3">
                         <input
-                          type="text"
+                          type="email"
                           className="form-control"
                           id="floatingInput"
                           placeholder="name@example.com"
                           name="email"
-                          onChange={(e) => {
-                            setEmail(e.target.value);
-                          }}
+                          value={formData.email}
+                          onChange={handleChange}
+                          required={true}
                         />
                         <label htmlFor="floatingInput">Email address</label>
                       </div>
@@ -96,9 +89,9 @@ const RegisterPage = () => {
                           id="floatingPassword"
                           placeholder="Password"
                           name="password"
-                          onChange={(e) => {
-                            setPassword(e.target.value);
-                          }}
+                          value={formData.password}
+                          onChange={handleChange}
+                          required
                         />
                         <label htmlFor="floatingPassword">Password</label>
                       </div>
@@ -109,32 +102,19 @@ const RegisterPage = () => {
                           id="floatingPassword"
                           placeholder="Confirm Password"
                           name="confirmPassword"
-                          onChange={(e) => {
-                            setConfirmPassword(e.target.value);
-                          }}
+                          value={formData.confirmPassword}
+                          onChange={handleChange}
+                          required
                         />
                         <label htmlFor="floatingPassword">
-                          Confirm-Password
+                          Confirm Password
                         </label>
-                      </div>
-
-                      <div className="form-floating mb-3">
-                        <DropDown
-                          options={roleOptions}
-                          name="role"
-                          onChange={(value) => {
-                            setRole(value);
-                          }}
-                          placeholder="select Role *"
-                          value={role}
-                        />
                       </div>
 
                       <div className="d-grid">
                         <button
                           className="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2"
-                          type="button"
-                          onClick={handleSubmit}
+                          type="submit"
                         >
                           Sign in
                         </button>
