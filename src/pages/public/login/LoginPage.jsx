@@ -1,107 +1,85 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./LoginPage.css";
 import { useNavigate } from "react-router";
-import leftArrow from "../../../assets/icons/leftArrow.svg";
+import { PRIVATE_ROUTES, PUBLIC_ROUTES } from "../../../utils/constants";
+import InputComponent from "../../../components/input/InputComponent";
 
 const LoginPage = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: "saurabh",
-    password: "Saurabh@123",
-    showPassword: false,
-  });
-
-  const [errors, setErrors] = useState({
     email: "",
     password: "",
+    showPassword: false,
+  });
+  const [errorMessage, setErrorMessage] = useState({
+    email: null,
+    password: null,
   });
 
-  useEffect(() => {
-    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-    if (currentUser && currentUser.isLoggedIn) {
-      navigate("/dashboard");
-    }
-  }, [navigate]);
-
-  // Handle changes
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
-    setFormData((prevData) => ({
-      ...prevData,
+    const { name, type, checked, value } = e.target;
+    setFormData({
+      ...formData,
       [name]: type === "checkbox" ? checked : value,
-    }));
-
-    // Clear error while typing
-    setErrors((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
+    });
+    setErrorMessage(null);
   };
 
-  // Handle onBlur validation
   const handleBlur = (e) => {
     const { name, value } = e.target;
-
-    let message = "";
-    if (!value.trim()) {
-      message = `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
+    if (value.trim() === "") {
+      setErrorMessage((prev) => {
+        return { ...prev, [name]: `${name} is required` };
+      });
     }
-
-    setErrors((prev) => ({
-      ...prev,
-      [name]: message,
-    }));
   };
 
-  // Submit login
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!formData.email || !formData.password) {
-      alert("Please fill in all fields");
+    if (formData.email.trim() === "" || formData.password.trim() === "") {
+      setErrorMessage({
+        email: formData.email.trim() === "" ? "Email is required" : null,
+        password:
+          formData.password.trim() === "" ? "Password is required" : null,
+      });
       return;
     }
-
-    const registerUser = JSON.parse(localStorage.getItem("registeredUser"));
-    if (!registerUser || registerUser.length === 0) {
-      alert("No registered users found. Please register first.");
+    const users = JSON.parse(localStorage.getItem("registeredUser")) || [];
+    if (users.length <= 0) {
+      alert("No users found. Please sign up first.");
+      navigate(`/${PUBLIC_ROUTES.SIGNUP}`);
       return;
     }
-
-    const registerUserDetails = registerUser?.find(
-      (user) => user.email === formData.email
+    const userData = users.find(
+      (user) =>
+        user.email === formData.email && user.password === formData.password
     );
-
-    if (
-      formData.email === registerUserDetails?.email &&
-      formData.password === registerUserDetails?.password
-    ) {
+    if (userData) {
       localStorage.setItem(
-        "currentUser",
-        JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          isLoggedIn: true,
-        })
+        "loggedInUser",
+        JSON.stringify({ ...userData, isLoggedIn: true })
       );
       alert("Login successful");
-      navigate("/dashboard");
+      navigate(`/${PRIVATE_ROUTES.DASHBOARD}`);
     } else {
       alert("Invalid credentials");
     }
   };
 
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (user && user.isLoggedIn) {
+      navigate(`/${PRIVATE_ROUTES.DASHBOARD}`);
+      return;
+    }
+  }, [navigate]);
+
   return (
     <div id="login">
       <div className="container-fluid ps-md-0">
         <div className="row g-0">
-          <div className="d-none d-md-flex col-md-4 col-lg-6 bg-image">
-            <img src={leftArrow} alt="left Arrow icon" className="icon" /> Go
-            Home
-          </div>
-
+          <div className="d-none d-md-flex col-md-4 col-lg-6 bg-image"></div>
           <div className="col-md-8 col-lg-6">
             <div className="login d-flex align-items-center py-5">
               <div className="container">
@@ -109,49 +87,29 @@ const LoginPage = () => {
                   <div className="col-md-9 col-lg-8 mx-auto">
                     <h3 className="login-heading mb-4">Welcome back!</h3>
 
-                    <form>
-                      {/* Email Field */}
-                      <div className="form-floating mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="floatingInput"
-                          placeholder="name@example.com"
-                          name="email"
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          value={formData.email}
-                        />
-                        <label htmlFor="floatingInput">Email address</label>
-                        {errors.email && (
-                          <p style={{ color: "red", marginTop: "5px" }}>
-                            {errors.email}
-                          </p>
-                        )}
-                      </div>
+                    <form onSubmit={handleSubmit}>
+                      <InputComponent
+                        type="email"
+                        placeholder="Email"
+                        handleChange={handleChange}
+                        onBlur={handleBlur}
+                        name="email"
+                        value={formData?.email}
+                        errorMessage={errorMessage?.email}
+                        label="Email address"
+                      />
+                      <InputComponent
+                        type={formData?.showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        handleChange={handleChange}
+                        onBlur={handleBlur}
+                        name="password"
+                        value={formData?.password}
+                        errorMessage={errorMessage?.password}
+                        label="Password"
+                      />
 
-                      {/* Password Field */}
-                      <div className="form-floating mb-3">
-                        <input
-                          type={formData.showPassword ? "text" : "password"}
-                          className="form-control"
-                          id="floatingPassword"
-                          placeholder="Password"
-                          name="password"
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          value={formData.password}
-                        />
-                        <label htmlFor="floatingPassword">Password</label>
-                        {errors.password && (
-                          <p style={{ color: "red", marginTop: "5px" }}>
-                            {errors.password}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Checkbox */}
-                      <div className="form-check mb-3">
+                      <div className="form-check mt-3">
                         <input
                           className="form-check-input"
                           type="checkbox"
@@ -168,14 +126,12 @@ const LoginPage = () => {
                         </label>
                       </div>
 
-                      {/* Login Button */}
                       <div className="d-grid">
                         <button
                           className="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2"
-                          type="button"
-                          onClick={handleSubmit}
+                          type="submit"
                         >
-                          Login
+                          Sign in
                         </button>
                       </div>
                     </form>
