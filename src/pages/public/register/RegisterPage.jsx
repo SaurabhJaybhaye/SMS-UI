@@ -1,47 +1,37 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router";
 import "../login/LoginPage.css";
 import { PUBLIC_ROUTES } from "../../../utils/constants";
+import { useFormik } from "formik";
+import { signupSchema } from "../../../utils/schemas";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validationSchema: signupSchema,
+    onSubmit: (values) => {
+      const oldUsers = JSON.parse(localStorage.getItem("registeredUser")) || [];
+      const updatedUsers = [
+        ...oldUsers,
+        {
+          name: values.name,
+          email: values.email,
+          password: values.password,
+          role: "user",
+        },
+      ];
+      localStorage.setItem("registeredUser", JSON.stringify(updatedUsers));
+      alert("Registration successful");
+      navigate(`/${PUBLIC_ROUTES.LOGIN}`);
+    },
   });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Registration attempted with", formData);
-    if (formData.password !== formData.confirmPassword) {
-      alert("password and confirm password do not match");
-      return;
-    }
-    const oldUsers = JSON.parse(localStorage.getItem("registeredUser")) || [];
-    const updatedUsers = [
-      ...oldUsers,
-      {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        role: "user",
-      },
-    ];
-    localStorage.setItem("registeredUser", JSON.stringify(updatedUsers));
-    alert("Registration successful");
-    navigate(`/${PUBLIC_ROUTES.LOGIN}`);
-  };
 
   return (
     <div id="login">
@@ -55,63 +45,90 @@ const RegisterPage = () => {
                   <div className="col-md-9 col-lg-8 mx-auto">
                     <h3 className="login-heading mb-4">Signup</h3>
 
-                    <form onSubmit={handleSubmit}>
-                      <div className="form-floating mb-3">
+                    <form onSubmit={formik.handleSubmit}>
+                      <div className="form-floating mt-3">
                         <input
                           type="text"
                           className="form-control"
-                          id="floatingInput"
+                          id="floatingInputName"
                           placeholder="Name"
                           name="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          required
+                          value={formik.values.name}
+                          onChange={formik.handleChange}
+                          autoComplete="userName"
+                          onBlur={formik.handleBlur}
                         />
-                        <label htmlFor="floatingInput">name</label>
+                        <label htmlFor="floatingInputName">name</label>
                       </div>
-                      <div className="form-floating mb-3">
+                      {formik.touched.name && formik.errors.name && (
+                        <label className="error-message">
+                          {formik.errors.name}
+                        </label>
+                      )}
+
+                      <div className="form-floating mt-3">
                         <input
                           type="email"
                           className="form-control"
-                          id="floatingInput"
+                          id="floatingInputEmail"
                           placeholder="name@example.com"
                           name="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          required={true}
+                          value={formik.values.email}
+                          onChange={formik.handleChange}
+                          autoComplete="email"
+                          onBlur={formik.handleBlur}
                         />
-                        <label htmlFor="floatingInput">Email address</label>
+                        <label htmlFor="floatingInputEmail">
+                          Email address
+                        </label>
                       </div>
-                      <div className="form-floating mb-3">
+                      {formik.touched.email && formik.errors.email && (
+                        <label className="error-message">
+                          {formik.errors.email}
+                        </label>
+                      )}
+                      <div className="form-floating mt-3">
                         <input
                           type="password"
                           className="form-control"
-                          id="floatingPassword"
+                          id="floatingNewPassword"
                           placeholder="Password"
                           name="password"
-                          value={formData.password}
-                          onChange={handleChange}
-                          required
+                          value={formik.values.password}
+                          onChange={formik.handleChange}
+                          autoComplete="new-password"
+                          onBlur={formik.handleBlur}
                         />
-                        <label htmlFor="floatingPassword">Password</label>
+                        <label htmlFor="floatingNewPassword">Password</label>
                       </div>
-                      <div className="form-floating mb-3">
+                      {formik.touched.password && formik.errors.password && (
+                        <label className="error-message">
+                          {formik.errors.password}
+                        </label>
+                      )}
+                      <div className="form-floating mt-3">
                         <input
                           type="password"
                           className="form-control"
-                          id="floatingPassword"
+                          id="floatingConfirmPassword"
                           placeholder="Confirm Password"
                           name="confirmPassword"
-                          value={formData.confirmPassword}
-                          onChange={handleChange}
-                          required
+                          value={formik.values.confirmPassword}
+                          onChange={formik.handleChange}
+                          autoComplete="confirm-new-password"
+                          onBlur={formik.handleBlur}
                         />
-                        <label htmlFor="floatingPassword">
+                        <label htmlFor="floatingConfirmPassword">
                           Confirm Password
                         </label>
                       </div>
-
-                      <div className="d-grid">
+                      {formik.touched.confirmPassword &&
+                        formik.errors.confirmPassword && (
+                          <label className="error-message">
+                            {formik.errors.confirmPassword}
+                          </label>
+                        )}
+                      <div className="d-grid mt-3">
                         <button
                           className="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2"
                           type="submit"
