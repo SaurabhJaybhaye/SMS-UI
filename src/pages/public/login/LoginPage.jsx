@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./LoginPage.css";
 import { useNavigate } from "react-router";
-import { PRIVATE_ROUTES, PUBLIC_ROUTES } from "../../../utils/constants";
+import {
+  PRIVATE_ROUTES,
+  BASE_API_URL,
+  API_ENDPOINTS,
+  LOCAL_STORAGE_KEYS,
+} from "../../../utils/constants";
 import InputComponent from "../../../components/input/InputComponent";
+import axios from "axios";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -35,6 +41,29 @@ const LoginPage = () => {
     }
   };
 
+  const handleLogin = async (credentials) => {
+    try {
+      const resp = await axios.post(
+        `${BASE_API_URL}${API_ENDPOINTS.LOGIN}`,
+        credentials
+      );
+      if (resp?.data?.success) {
+        localStorage.setItem(
+          LOCAL_STORAGE_KEYS.LOGGED_IN_USER,
+          JSON.stringify({ ...resp.data, isLoggedIn: true })
+        );
+        alert(resp?.data?.message || "Login successful");
+        navigate(`/${PRIVATE_ROUTES.DASHBOARD}`);
+      }
+    } catch (error) {
+      alert(
+        error?.response?.data?.message ||
+          error?.response?.message ||
+          "Login failed"
+      );
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.email.trim() === "" || formData.password.trim() === "") {
@@ -45,26 +74,7 @@ const LoginPage = () => {
       });
       return;
     }
-    const users = JSON.parse(localStorage.getItem("registeredUser")) || [];
-    if (users.length <= 0) {
-      alert("No users found. Please sign up first.");
-      navigate(`/${PUBLIC_ROUTES.SIGNUP}`);
-      return;
-    }
-    const userData = users.find(
-      (user) =>
-        user.email === formData.email && user.password === formData.password
-    );
-    if (userData) {
-      localStorage.setItem(
-        "loggedInUser",
-        JSON.stringify({ ...userData, isLoggedIn: true })
-      );
-      alert("Login successful");
-      navigate(`/${PRIVATE_ROUTES.DASHBOARD}`);
-    } else {
-      alert("Invalid credentials");
-    }
+    handleLogin({ email: formData.email, password: formData.password });
   };
 
   useEffect(() => {

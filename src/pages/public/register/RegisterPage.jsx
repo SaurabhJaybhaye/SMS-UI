@@ -1,12 +1,37 @@
 import React from "react";
 import { useNavigate } from "react-router";
 import "../login/LoginPage.css";
-import { PUBLIC_ROUTES } from "../../../utils/constants";
+import {
+  PUBLIC_ROUTES,
+  API_ENDPOINTS,
+  BASE_API_URL,
+} from "../../../utils/constants";
 import { useFormik } from "formik";
 import { signupSchema } from "../../../utils/schemas";
+import axios from "axios";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+
+  const handleRegister = async (userData) => {
+    try {
+      const resp = await axios.post(
+        `${BASE_API_URL}${API_ENDPOINTS.REGISTER}`,
+        userData
+      );
+      if (resp?.data?.success) {
+        alert(resp?.data?.message);
+        navigate(`/${PUBLIC_ROUTES.LOGIN}`);
+      }
+    } catch (error) {
+      alert(
+        error?.response?.data?.message ||
+          error?.response?.message ||
+          "Registration failed"
+      );
+      formik.resetForm();
+    }
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -17,19 +42,8 @@ const RegisterPage = () => {
     },
     validationSchema: signupSchema,
     onSubmit: (values) => {
-      const oldUsers = JSON.parse(localStorage.getItem("registeredUser")) || [];
-      const updatedUsers = [
-        ...oldUsers,
-        {
-          name: values.name,
-          email: values.email,
-          password: values.password,
-          role: "user",
-        },
-      ];
-      localStorage.setItem("registeredUser", JSON.stringify(updatedUsers));
-      alert("Registration successful");
-      navigate(`/${PUBLIC_ROUTES.LOGIN}`);
+      const { name, email, password } = values;
+      handleRegister({ name, email, password });
     },
   });
 

@@ -4,6 +4,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import {
+  LOCAL_STORAGE_KEYS,
   PRIVATE_ROUTES,
   PUBLIC_ROUTES,
   SCHOOL_NAME,
@@ -13,12 +14,12 @@ const HeaderComponent = () => {
   const navigate = useNavigate();
   const navItems = [
     { title: "Dashboard", path: PRIVATE_ROUTES.DASHBOARD },
-    { title: "Students", path: PRIVATE_ROUTES.STUDENT_LIST },
+    { title: "Students", path: PRIVATE_ROUTES.STUDENTS },
     { title: "Settings", path: PRIVATE_ROUTES.SETTINGS },
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("loggedInUser");
+    localStorage.removeItem(LOCAL_STORAGE_KEYS.LOGGED_IN_USER);
     navigate(PUBLIC_ROUTES.LOGIN);
   };
 

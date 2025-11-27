@@ -11,7 +11,7 @@ const PrivateRoutes = [
         element: <DashboardPage />,
       },
       {
-        path: PRIVATE_ROUTES.STUDENT_LIST,
+        path: PRIVATE_ROUTES.STUDENTS,
         element: <StudentsPage />,
       },
     ],
